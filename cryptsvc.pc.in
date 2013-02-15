@@ -1,0 +1,11 @@
+prefix=/usr
+libdir=/usr/lib
+includedir=/usr/include
+
+Name: libcryptsvc
+Description:nothing 
+Version: 0.0.1
+Requires: openssl  
+Libs: -L${libdir} -lcryptsvc
+Cflags: -I${includedir}
+ 
