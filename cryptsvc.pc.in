@@ -6,6 +6,6 @@ Name: libcryptsvc
 Description:nothing 
 Version: 0.0.1
 Requires: openssl  
-Libs: -L${libdir} -lcryptsvc
+Libs: -L${libdir} -lcryptsvc -ltzsvc
 Cflags: -I${includedir}
  

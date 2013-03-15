@@ -92,6 +92,7 @@ typedef enum {false, true} bool;
 //#define SEC_CRYPTP_ARR_LENGTH		1024
 #define SEC_FRAME_OSP_KEY		"uniqueKey"
 //#define SHA1_DIGEST_VALUE_LEN		20
+#define SHA256_DIGEST_VALUE_LEN		32
 //#define KDF_KEYLEN			16
 #define HASH_LEN			20
 //#define SEC_KEYMGR_FEK_SIZE		16

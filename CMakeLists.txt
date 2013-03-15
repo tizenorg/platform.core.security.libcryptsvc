@@ -42,7 +42,7 @@ SET(libcryptsvc_CPPFLAGS " -DPIC ")
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${SRCS})
 
 IF("${ARCH}" MATCHES "arm")
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${pkgs_LDFLAGS} -ldl -lssl -lcrypto -L./libs -lShpSec)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${pkgs_LDFLAGS} -ldl -lssl -lcrypto -L./libs -lDeviceInfo)
 ELSEIF("${ARCH}" MATCHES "x86")
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${pkgs_LDFLAGS} -ldl -lssl -lcrypto)
 ENDIF("${ARCH}" MATCHES "arm")
@@ -55,6 +55,35 @@ SET_TARGET_PROPERTIES(
 	VERSION 0.0.0
 )
 ##################################################################################################################
+
+##################################################################################################################
+# for libtzsvc.so
+SET(SRCS_TZ
+	${source_dir}/SecCryptoSvc.c
+	${source_dir}/SecTzSvc.c
+)
+
+SET(libtzsvc_LDFLAGS " -module -avoid-version ${pkgs_LDFLAGS} ")
+SET(libtzsvc_CFLAGS " ${CFLAGS} -fvisibility=hidden -g -fPIC -I${CMAKE_CURRENT_SOURCE_DIR}/include ")
+SET(libtzsvc_CPPFLAGS " -DPIC ")
+
+SET(LIBTZ_SO "tzsvc")
+ADD_LIBRARY(${LIBTZ_SO} SHARED ${SRCS_TZ})
+
+IF("${ARCH}" MATCHES "arm")
+TARGET_LINK_LIBRARIES(${LIBTZ_SO} ${pkgs_LDFLAGS} -ldl -lssl -lcrypto -L./libs -lDeviceInfo)
+ELSEIF("${ARCH}" MATCHES "x86")
+TARGET_LINK_LIBRARIES(${LIBTZ_SO} ${pkgs_LDFLAGS} -ldl -lssl -lcrypto)
+ENDIF("${ARCH}" MATCHES "arm")
+
+SET_TARGET_PROPERTIES(
+	${LIBTZ_SO}
+	PROPERTIES
+	SOVERSION 0
+	VERSION 0.0.0
+)
+##################################################################################################################
+
 
 ##################################################################################################################
 # for module_test
@@ -83,6 +112,7 @@ ENDIF("${ARCH}" MATCHES "arm")
 CONFIGURE_FILE(${PROJECT_NAME}.pc.in ${PROJECT_NAME}.pc)
 INSTALL(FILES ${PROJECT_NAME}.pc DESTINATION lib/pkgconfig)
 INSTALL(TARGETS ${PROJECT_NAME} DESTINATION lib)
+INSTALL(TARGETS ${LIBTZ_SO} DESTINATION lib)
 INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION /usr/include)
 
 ADD_DEFINITIONS(-D_bool_cryptsvc)
