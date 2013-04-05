@@ -8,8 +8,10 @@ SET(INCLUDEDIR "\${prefix}/include")
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+SET(pc_requires " openssl dlog libcrypto ")
+
 INCLUDE(FindPkgConfig)
-pkg_check_modules(pkgs REQUIRED openssl dlog)
+pkg_check_modules(pkgs REQUIRED ${pc_requires})
 
 FOREACH(flag ${pkgs_CFLAGS})
 	SET(EXTRA_CFLAGS "${EXTRA_CFLAGS} ${flag}")
@@ -41,18 +43,17 @@ SET(libcryptsvc_CPPFLAGS " -DPIC ")
 
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${SRCS})
 
-IF("${ARCH}" MATCHES "arm")
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${pkgs_LDFLAGS} -ldl -lssl -lcrypto -L./libs -lDeviceInfo)
-ELSEIF("${ARCH}" MATCHES "x86")
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${pkgs_LDFLAGS} -ldl -lssl -lcrypto)
-ENDIF("${ARCH}" MATCHES "arm")
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${pkgs_LDFLAGS})
 
+IF("${ARCH}" MATCHES "arm")
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} -L./libs -lDeviceInfo)
+ENDIF("${ARCH}" MATCHES "arm")
 
 SET_TARGET_PROPERTIES(
 	${PROJECT_NAME}
 	PROPERTIES
-	SOVERSION 0
-	VERSION 0.0.0
+	VERSION ${FULLVER}
+	SOVERSION ${MAJORVER}
 )
 ##################################################################################################################
 
@@ -70,17 +71,17 @@ SET(libtzsvc_CPPFLAGS " -DPIC ")
 SET(LIBTZ_SO "tzsvc")
 ADD_LIBRARY(${LIBTZ_SO} SHARED ${SRCS_TZ})
 
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${pkgs_LDFLAGS})
+
 IF("${ARCH}" MATCHES "arm")
-TARGET_LINK_LIBRARIES(${LIBTZ_SO} ${pkgs_LDFLAGS} -ldl -lssl -lcrypto -L./libs -lDeviceInfo)
-ELSEIF("${ARCH}" MATCHES "x86")
-TARGET_LINK_LIBRARIES(${LIBTZ_SO} ${pkgs_LDFLAGS} -ldl -lssl -lcrypto)
+TARGET_LINK_LIBRARIES(${LIBTZ_SO} -L./libs -lDeviceInfo)
 ENDIF("${ARCH}" MATCHES "arm")
 
 SET_TARGET_PROPERTIES(
 	${LIBTZ_SO}
 	PROPERTIES
-	SOVERSION 0
-	VERSION 0.0.0
+	VERSION ${FULLVER}
+	SOVERSION ${MAJORVER}
 )
 ##################################################################################################################
 
@@ -108,11 +109,15 @@ IF("${ARCH}" MATCHES "arm")
 	#MESSAGE("add -DTARGET")
 ENDIF("${ARCH}" MATCHES "arm")
 
+SET(PC_NAME ${PROJECT_NAME})
+SET(PC_DESCRIPTION ${DESCRIPTION})
+SET(PC_LDFLAGS " -l${PROJECT_NAME} -l${LIBTZ_SO} ")
+SET(PC_REQUIRED ${pc_requires})
+CONFIGURE_FILE(${PROJECT_NAME}.pc.in ${PROJECT_NAME}.pc @ONLY)
 
-CONFIGURE_FILE(${PROJECT_NAME}.pc.in ${PROJECT_NAME}.pc)
 INSTALL(FILES ${PROJECT_NAME}.pc DESTINATION lib/pkgconfig)
 INSTALL(TARGETS ${PROJECT_NAME} DESTINATION lib)
 INSTALL(TARGETS ${LIBTZ_SO} DESTINATION lib)
-INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION /usr/include)
+INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION ${INCLUDEDIR})
 
 ADD_DEFINITIONS(-D_bool_cryptsvc)

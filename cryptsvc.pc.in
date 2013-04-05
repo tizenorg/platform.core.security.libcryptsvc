@@ -1,11 +1,13 @@
-prefix=/usr
-libdir=/usr/lib
-includedir=/usr/include
+# Package Information for pkg-config
 
-Name: libcryptsvc
-Description:nothing 
-Version: 0.0.1
-Requires: openssl  
-Libs: -L${libdir} -lcryptsvc -ltzsvc
+prefix=@PREFIX@
+libdir=@PREFIX@/lib
+includedir=@PREFIX@/include
+
+Name: @PC_NAME@
+Description: @DESCRIPTION@
+Version: @FULLVER@
+Requires: @PC_REQUIRED@
+Libs: -L${libdir} @PC_LDFLAGS@
 Cflags: -I${includedir}
- 
+

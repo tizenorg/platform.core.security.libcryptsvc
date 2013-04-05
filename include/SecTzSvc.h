@@ -35,9 +35,9 @@ typedef unsigned long   TZCRYPT_UINT64;
 #define SHA256_DIGEST_VALUE_LEN         32
 
 /*
- * This function provides an encryption of user data. 
+ * This function provides an encryption of user data.
  *
- * @param [in] Src  : User data to be encrypted 
+ * @param [in] Src  : User data to be encrypted
  * @param [in] SrcLen : Length of user data to be encrypted (multiple by chunk size, SIZE_CHUNK)
  * @param [out] Dst : Encrypted data
  * @param [out] *DstLen : a pointer to length of encrypted data (multiple by secure object size, SIZE_SECUREOBJECT)

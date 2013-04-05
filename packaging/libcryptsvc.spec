@@ -1,7 +1,7 @@
-Name:      libcryptsvc 
+Name:      libcryptsvc
 Summary:   nothing
 Version:    0.0.1
-Release:    4
+Release:    5
 Group:      Osp/Security
 License:    APLv2
 Source0:    %{name}-%{version}.tar.gz
@@ -23,18 +23,19 @@ Requires: %{name} = %{version}-%{release}
 %setup -q
 
 %build
+MAJORVER=`echo %{version} | awk 'BEGIN {FS="."}{print $1}'`
 %ifarch %{ix86}
-cmake . -DCMAKE_INSTALL_PREFIX=%{_prefix} -DARCH=x86
+cmake . -DCMAKE_INSTALL_PREFIX=%{_prefix} -DARCH=x86 -DFULLVER=%{version} -DMAJORVER=${MAJORVER} -DDESCRIPTION=%{summary}
 %else
-cmake . -DCMAKE_INSTALL_PREFIX=%{_prefix} -DARCH=arm
+cmake . -DCMAKE_INSTALL_PREFIX=%{_prefix} -DARCH=arm -DFULLVER=%{version} -DMAJORVER=${MAJORVER} -DDESCRIPTION=%{summary}
 %endif
 make %{?jobs:-j%jobs}
 
 %install
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/usr/share/license	
-cp LICENSE.APLv2 %{buildroot}/usr/share/license/%{name}
-cp LICENSE.Flora %{buildroot}/usr/share/license/%{name}
+mkdir -p %{buildroot}/usr/share/license
+cat LICENSE.APLv2 > %{buildroot}/usr/share/license/%{name}
+cat LICENSE.Flora >> %{buildroot}/usr/share/license/%{name}
 
 %make_install
 
@@ -45,4 +46,3 @@ cp LICENSE.Flora %{buildroot}/usr/share/license/%{name}
 %files devel
 %{_includedir}/*
 %{_libdir}/pkgconfig/cryptsvc.pc
-%{_datadir}/license/%{name}

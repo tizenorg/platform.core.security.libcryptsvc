@@ -27,9 +27,9 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <openssl/sha.h>
-#include <openssl/evp.h> 
+#include <openssl/evp.h>
 #include <openssl/aes.h>
-#include <openssl/crypto.h> 
+#include <openssl/crypto.h>
 
 #include "SecTzSvc.h"
 #include "SecCryptoSvc.h"
@@ -45,11 +45,11 @@
 
 unsigned char* AES_Crypto(unsigned char* p_text, unsigned char* c_text, unsigned char* aes_key, unsigned char* iv, int mode,  unsigned long size)
 {
-    AES_KEY e_key, d_key;               
-		    
+    AES_KEY e_key, d_key;
+
     AES_set_encrypt_key(aes_key, 128, &e_key);
     AES_set_decrypt_key(aes_key, 128, &d_key);
-					    
+
     if(mode == 1)
     {
 		AES_cbc_encrypt(p_text, c_text, size, &e_key, iv, AES_ENCRYPT);
@@ -126,14 +126,14 @@ TZCRYPT_Result SecDecryptTZCrypt(TZCRYPT_UINT8 *Src, TZCRYPT_UINT32 SrcLen, TZCR
 #ifdef CRYPTOSVC_TZ
 	if(SrcLen % SIZE_SECUREOBJECT != 0 ){
                 LOGE("Ciphertext chunk size :: Test for Encryption of TZ Crypt failed!!! [Return Value] = %.8x\n", ret);
-                return ret;		
+                return ret;
 	}
 
 	if(WrapAppInfoLen != SIZE_WRAPAPPIDENTITY){
 		LOGE("Wrapped App Identity Size :: failed!!! [Return Value] = %.8x\n", ret);
 		return ret;
 	}
-	
+
 	TZCRYPT_UINT8 *unwrapData = NULL;
 	TZCRYPT_UINT32 unwrapDatalen = SIZE_HASHAPPIDENTITY;
 	unwrapData = (TZCRYPT_UINT8 *)malloc(unwrapDatalen);
@@ -154,7 +154,7 @@ TZCRYPT_Result SecDecryptTZCrypt(TZCRYPT_UINT8 *Src, TZCRYPT_UINT32 SrcLen, TZCR
 		LOGE("Test for Hash AppInfo of TZ Crypt failed!!! [Return Value] = %.8x\n", ret);
 		return SEC_CRYPTO_HASH_ERROR;
     }
-	
+
 	if( 0 != memcmp(unwrapData, hashData, hashDatalen) || hashDatalen != unwrapDatalen){
 		LOGE("App Info Identity is NOT same as hash Info of a given Identity\n");
 		return SEC_CRYPTO_HASH_ERROR;
