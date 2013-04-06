@@ -1,7 +1,7 @@
 Name:      libcryptsvc
 Summary:   nothing
 Version:    0.0.1
-Release:    5
+Release:    6
 Group:      Osp/Security
 License:    APLv2
 Source0:    %{name}-%{version}.tar.gz
