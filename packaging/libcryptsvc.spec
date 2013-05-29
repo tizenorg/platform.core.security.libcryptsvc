@@ -3,7 +3,7 @@ Summary:    Crypto Service Library
 Version:    0.0.1
 Release:    6
 Group:      Security/Libraries
-License:    Apache-2.0
+License:    Apache-2.0 and Flora
 Source0:    %{name}-%{version}.tar.gz
 BuildRequires: cmake
 BuildRequires: pkgconfig(dlog)
