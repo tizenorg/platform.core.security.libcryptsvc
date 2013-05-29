@@ -1,7 +1,7 @@
 # Package Information for pkg-config
 
 prefix=@PREFIX@
-libdir=@PREFIX@/lib
+libdir=@LIB_INSTALL_DIR@
 includedir=@PREFIX@/include
 
 Name: @PC_NAME@

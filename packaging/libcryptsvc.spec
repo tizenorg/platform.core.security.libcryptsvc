@@ -24,10 +24,10 @@ Requires: %{name} = %{version}-%{release}
 
 %build
 MAJORVER=`echo %{version} | awk 'BEGIN {FS="."}{print $1}'`
-%ifarch %{ix86}
-cmake . -DCMAKE_INSTALL_PREFIX=%{_prefix} -DARCH=x86 -DFULLVER=%{version} -DMAJORVER=${MAJORVER} -DDESCRIPTION=%{summary}
+%ifarch %ix86 x86_64
+%cmake . -DARCH=x86 -DFULLVER=%{version} -DMAJORVER=${MAJORVER} -DDESCRIPTION=%{summary}
 %else
-cmake . -DCMAKE_INSTALL_PREFIX=%{_prefix} -DARCH=arm -DFULLVER=%{version} -DMAJORVER=${MAJORVER} -DDESCRIPTION=%{summary}
+%cmake . -DARCH=arm -DFULLVER=%{version} -DMAJORVER=${MAJORVER} -DDESCRIPTION=%{summary}
 %endif
 make %{?jobs:-j%jobs}
 
