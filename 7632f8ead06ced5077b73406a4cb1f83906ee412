@@ -1,0 +1,8 @@
+Change-Id: I7632f8ead06ced5077b73406a4cb1f83906ee412
+Code-Review+2: Anas Nashif
+Verified+1: Xavier Roche <xavier.roche@eurogiciel.fr>
+Submitted-by: Anas Nashif
+Submitted-at: Wed, 29 May 2013 08:02:53 -0700
+Reviewed-on: https://review.tizen.org/gerrit/3753
+Project: platform/core/security/libcryptsvc
+Branch: refs/heads/tizen
