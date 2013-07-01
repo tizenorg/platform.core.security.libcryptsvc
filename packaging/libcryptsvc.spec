@@ -5,6 +5,7 @@ Release:    6
 Group:      Security/Libraries
 License:    Apache-2.0 and Flora
 Source0:    %{name}-%{version}.tar.gz
+Source1001: 	libcryptsvc.manifest
 BuildRequires: cmake
 BuildRequires: pkgconfig(dlog)
 BuildRequires: pkgconfig(openssl)
@@ -22,6 +23,7 @@ Crypto Service Library (Development).
 
 %prep
 %setup -q
+cp %{SOURCE1001} .
 
 %build
 MAJORVER=`echo %{version} | awk 'BEGIN {FS="."}{print $1}'`
@@ -41,9 +43,11 @@ make %{?jobs:-j%jobs}
 %postun -p /sbin/ldconfig
 
 %files
+%manifest %{name}.manifest
 %license  LICENSE.APLv2 LICENSE.Flora
 %{_libdir}/*.so*
 
 %files devel
+%manifest %{name}.manifest
 %{_includedir}/*
 %{_libdir}/pkgconfig/cryptsvc.pc
