@@ -37,7 +37,7 @@ SET(SRCS
 	#${source_dir}/SecKmBase64.c
 )
 
-SET(libcryptsvc_LDFLAGS "-module -avoid-version ${pkgs_LDFLAGS}")
+SET(libcryptsvc_LDFLAGS "${pkgs_LDFLAGS}")
 SET(libcryptsvc_CFLAGS " ${CFLAGS} -fvisibility=hidden -g -fPIC -I${CMAKE_CURRENT_SOURCE_DIR}/include ")
 SET(libcryptsvc_CPPFLAGS " -DPIC ")
 
@@ -64,7 +64,7 @@ SET(SRCS_TZ
 	${source_dir}/SecTzSvc.c
 )
 
-SET(libtzsvc_LDFLAGS "-module -avoid-version ${pkgs_LDFLAGS}")
+SET(libtzsvc_LDFLAGS "${pkgs_LDFLAGS}")
 SET(libtzsvc_CFLAGS " ${CFLAGS} -fvisibility=hidden -g -fPIC -I${CMAKE_CURRENT_SOURCE_DIR}/include ")
 SET(libtzsvc_CPPFLAGS " -DPIC ")
 
