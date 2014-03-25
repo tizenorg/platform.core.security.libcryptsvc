@@ -97,6 +97,17 @@ typedef enum {false, true} bool;
 #define HASH_LEN			20
 //#define SEC_KEYMGR_FEK_SIZE		16
 
+/*------ Base64 Encoding Table ------*/
+static const char Base64EncodingTable[] = {
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
+    'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+    'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+    'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
+    'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+    'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+    'w', 'x', 'y', 'z', '0', '1', '2', '3',
+	'4', '5', '6', '7', '8', '9', '+', '/'
+};
 
 /**
 	* This function provides Device UniqueKey for crypto with Hash
@@ -106,6 +117,12 @@ typedef enum {false, true} bool;
 */
 __attribute__((visibility("default")))
 bool SecFrameGeneratePlatformUniqueKey(IN UINT32  uLen,IN OUT UINT8  *pCek);
+
+__attribute__((visibility("default")))
+char* Base64Encoding(char* pData, int size);
+
+__attribute__((visibility("default")))
+char* GetDuid(int size);
 
 #ifdef __cplusplus
 }

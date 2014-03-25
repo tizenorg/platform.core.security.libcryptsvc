@@ -34,6 +34,15 @@ typedef unsigned long   TZCRYPT_UINT64;
 
 #define SHA256_DIGEST_VALUE_LEN         32
 
+/* Sec Crypto error code */
+#define SEC_CRYPTO_SUCCESS                              0x00000000
+#define SEC_CRYPTO_ENCRYPT_ERROR                                0x30000001
+#define SEC_CRYPTO_DECRYPT_ERROR                                0x30000002
+#define SEC_CRYPTO_WRAPIDENTITY_ERROR                           0x30000003
+#define SEC_CRYPTO_UNWRAPIDENTITY_ERROR                         0x30000004
+#define SEC_CRYPTO_HASH_ERROR                           0x30000005
+#define SEC_CRYPTO_GENERATE_KEY_ERROR                           0x30000006
+#define SEC_CRYPTO_RETRIEVE_KEY_ERROR                           0x30000007
 /*
  * This function provides an encryption of user data.
  *

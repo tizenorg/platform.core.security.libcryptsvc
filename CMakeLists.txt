@@ -3,6 +3,7 @@ PROJECT(cryptsvc C)
 
 SET(PREFIX ${CMAKE_INSTALL_PREFIX})
 SET(EXEC_PREFIX "\${prefix}")
+SET(LIBDIR "\${prefix}/lib")
 SET(INCLUDEDIR "\${prefix}/include")
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -31,9 +32,7 @@ SET(EXTRA_CXXFLAGS "${EXTRA_CXXFLAGS} ${EXTRA_CFLAGS}")
 ##################################################################################################################
 # for libcryptsvc.so
 SET(SRCS
-	#${source_dir}/CryptoSvc-debug.c
 	${source_dir}/SecCryptoSvc.c
-	#${source_dir}/SecKmBase64.c
 )
 
 SET(libcryptsvc_LDFLAGS "${pkgs_LDFLAGS}")
@@ -45,7 +44,7 @@ ADD_LIBRARY(${PROJECT_NAME} SHARED ${SRCS})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${libcryptsvc_LDFLAGS})
 
 IF("${ARCH}" MATCHES "arm")
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} -L./libs -lDeviceInfo)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME})
 ENDIF("${ARCH}" MATCHES "arm")
 
 SET_TARGET_PROPERTIES(
@@ -58,30 +57,30 @@ SET_TARGET_PROPERTIES(
 
 ##################################################################################################################
 # for libtzsvc.so
-SET(SRCS_TZ
-	${source_dir}/SecCryptoSvc.c
-	${source_dir}/SecTzSvc.c
-)
+#SET(SRCS_TZ
+#	${source_dir}/SecTzSvc.c
+#)
 
-SET(libtzsvc_LDFLAGS "${pkgs_LDFLAGS}")
-SET(libtzsvc_CFLAGS " ${CFLAGS} -fvisibility=hidden -g -fPIC -I${CMAKE_CURRENT_SOURCE_DIR}/include ")
-SET(libtzsvc_CPPFLAGS " -DPIC ")
+#SET(libtzsvc_LDFLAGS "${pkgs_LDFLAGS}")
+#SET(libtzsvc_CFLAGS " ${CFLAGS} -fvisibility=hidden -g -fPIC -I${CMAKE_CURRENT_SOURCE_DIR}/include ")
+#SET(libtzsvc_CPPFLAGS " -DPIC ")
 
-SET(LIBTZ_SO "tzsvc")
-ADD_LIBRARY(${LIBTZ_SO} SHARED ${SRCS_TZ})
+#SET(LIBTZ_SO "tzsvc")
+#ADD_LIBRARY(${LIBTZ_SO} SHARED ${SRCS_TZ})
 
-TARGET_LINK_LIBRARIES(${LIBTZ_SO} ${libtzsvc_LDFLAGS})
+#TARGET_LINK_LIBRARIES(${LIBTZ_SO} ${libtzsvc_LDFLAGS})
 
-IF("${ARCH}" MATCHES "arm")
-TARGET_LINK_LIBRARIES(${LIBTZ_SO} -L./libs -lDeviceInfo)
-ENDIF("${ARCH}" MATCHES "arm")
+#IF("${ARCH}" MATCHES "arm")
+#TARGET_LINK_LIBRARIES(${LIBTZ_SO})
+#ENDIF("${ARCH}" MATCHES "arm")
 
-SET_TARGET_PROPERTIES(
-	${LIBTZ_SO}
-	PROPERTIES
-	VERSION ${FULLVER}
-	SOVERSION ${MAJORVER}
-)
+
+#SET_TARGET_PROPERTIES(
+#	${LIBTZ_SO}
+#	PROPERTIES
+#	VERSION ${FULLVER}
+#	SOVERSION ${MAJORVER}
+#)
 ##################################################################################################################
 
 
@@ -105,18 +104,19 @@ SET_TARGET_PROPERTIES(
 IF("${ARCH}" MATCHES "arm")
 	#ADD_DEFINITIONS("-DTARGET")
 	ADD_DEFINITIONS("-DCRYPTOSVC_TARGET")
+	ADD_DEFINITIONS("-DCRYPTOSVC_TZ")
 	#MESSAGE("add -DTARGET")
 ENDIF("${ARCH}" MATCHES "arm")
 
 SET(PC_NAME ${PROJECT_NAME})
 SET(PC_DESCRIPTION ${DESCRIPTION})
-SET(PC_LDFLAGS " -l${PROJECT_NAME} -l${LIBTZ_SO} ")
+SET(PC_LDFLAGS " -l${PROJECT_NAME} ")
 SET(PC_REQUIRED ${pc_requires})
 CONFIGURE_FILE(${PROJECT_NAME}.pc.in ${PROJECT_NAME}.pc @ONLY)
 
-INSTALL(FILES ${PROJECT_NAME}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
-INSTALL(TARGETS ${PROJECT_NAME} DESTINATION ${LIB_INSTALL_DIR})
-INSTALL(TARGETS ${LIBTZ_SO} DESTINATION ${LIB_INSTALL_DIR})
+INSTALL(FILES ${PROJECT_NAME}.pc DESTINATION lib/pkgconfig)
+INSTALL(TARGETS ${PROJECT_NAME} DESTINATION lib)
+INSTALL(TARGETS ${LIBTZ_SO} DESTINATION lib)
 INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION ${INCLUDEDIR})
 
 ADD_DEFINITIONS(-D_bool_cryptsvc)
