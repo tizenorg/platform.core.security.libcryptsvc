@@ -30,7 +30,11 @@ MAJORVER=`echo %{version} | awk 'BEGIN {FS="."}{print $1}'`
 %ifarch %ix86 x86_64
 %cmake . -DARCH=x86 -DFULLVER=%{version} -DMAJORVER=${MAJORVER} -DDESCRIPTION="%{summary}"
 %else
+%ifarch aarch64
+%cmake . -DFULLVER=%{version} -DMAJORVER=${MAJORVER} -DDESCRIPTION="%{summary}"
+%else
 %cmake . -DARCH=arm -DFULLVER=%{version} -DMAJORVER=${MAJORVER} -DDESCRIPTION="%{summary}"
+%endif
 %endif
 make %{?jobs:-j%jobs}
 
