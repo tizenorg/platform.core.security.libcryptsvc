@@ -3,7 +3,7 @@ Summary:    Crypto Service Library
 Version:    0.0.1
 Release:    6
 Group:      Security/Libraries
-License:    Apache-2.0 and Flora
+License:    Apache-2.0
 Source0:    %{name}-%{version}.tar.gz
 Source1001: 	libcryptsvc.manifest
 BuildRequires: cmake
@@ -44,7 +44,7 @@ make %{?jobs:-j%jobs}
 
 %files
 %manifest %{name}.manifest
-%license  LICENSE.APLv2 LICENSE.Flora
+%license  LICENSE.APLv2
 %{_libdir}/*.so*
 
 %files devel
