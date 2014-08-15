@@ -45,9 +45,9 @@ make %{?jobs:-j%jobs}
 %files
 %manifest %{name}.manifest
 %license  LICENSE.APLv2
-%{_libdir}/*.so*
+/usr/lib/*.so*
 
 %files devel
 %manifest %{name}.manifest
 %{_includedir}/*
-%{_libdir}/pkgconfig/cryptsvc.pc
+/usr/lib/pkgconfig/cryptsvc.pc
