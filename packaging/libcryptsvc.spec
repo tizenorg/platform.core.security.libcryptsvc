@@ -9,6 +9,9 @@ Source1001: 	libcryptsvc.manifest
 BuildRequires: cmake
 BuildRequires: pkgconfig(dlog)
 BuildRequires: pkgconfig(openssl)
+BuildRequires: pkgconfig(capi-system-info)
+BuildRequires:  pkgconfig(libtzplatform-config)
+Requires: pkgconfig(libtzplatform-config)
 
 %description
 Crypto Service Library.
@@ -28,10 +31,13 @@ cp %{SOURCE1001} .
 %build
 MAJORVER=`echo %{version} | awk 'BEGIN {FS="."}{print $1}'`
 %ifarch %ix86 x86_64
-%cmake . -DARCH=x86 -DFULLVER=%{version} -DMAJORVER=${MAJORVER} -DDESCRIPTION="%{summary}"
+%cmake . -DARCH=x86 \
 %else
-%cmake . -DARCH=arm -DFULLVER=%{version} -DMAJORVER=${MAJORVER} -DDESCRIPTION="%{summary}"
+%cmake . -DARCH=arm \
 %endif
+    -DFULLVER=%{version} -DMAJORVER=${MAJORVER} -DDESCRIPTION="%{summary}" \
+    -DTZ_SYS_ETC=%TZ_SYS_ETC
+
 make %{?jobs:-j%jobs}
 
 %install
@@ -46,6 +52,7 @@ make %{?jobs:-j%jobs}
 %manifest %{name}.manifest
 %license  LICENSE.APLv2
 %{_libdir}/*.so*
+%attr(755,root,root) %{TZ_SYS_ETC}/duid-gadget
 
 %files devel
 %manifest %{name}.manifest
