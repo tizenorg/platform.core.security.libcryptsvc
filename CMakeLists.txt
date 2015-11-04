@@ -7,7 +7,7 @@ SET(INCLUDEDIR "\${prefix}/include")
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-SET(pc_requires " openssl dlog libcrypto ")
+SET(pc_requires " openssl dlog libcrypto capi-system-info")
 
 INCLUDE(FindPkgConfig)
 pkg_check_modules(pkgs REQUIRED ${pc_requires})
@@ -55,31 +55,31 @@ SET_TARGET_PROPERTIES(
 ##################################################################################################################
 
 ##################################################################################################################
-# for libtzsvc.so
-#SET(SRCS_TZ
-#	${source_dir}/SecTzSvc.c
-#)
+# for libdevice_info.so
+SET(SRCS_DEVICE_INFO
+    ${source_dir}/device_info.c
+)
 
-#SET(libtzsvc_LDFLAGS "${pkgs_LDFLAGS}")
-#SET(libtzsvc_CFLAGS " ${CFLAGS} -fvisibility=hidden -g -fPIC -I${CMAKE_CURRENT_SOURCE_DIR}/include ")
-#SET(libtzsvc_CPPFLAGS " -DPIC ")
+SET(libdevice_info_LDFLAGS "${pkgs_LDFLAGS}")
+SET(libdevice_info_CFLAGS " ${CFLAGS} ${CMAKE_C_FLAGS} -fvisibility=hidden -g -fPIC -I${CMAKE_CURRENT_SOURCE_DIR}/include ")
+SET(libdevice_info_CPPFLAGS " -DPIC ")
 
-#SET(LIBTZ_SO "tzsvc")
-#ADD_LIBRARY(${LIBTZ_SO} SHARED ${SRCS_TZ})
+SET(LIBDEVICE_INFO_SO "device_info")
+ADD_LIBRARY(${LIBDEVICE_INFO_SO} SHARED ${SRCS_DEVICE_INFO})
 
-#TARGET_LINK_LIBRARIES(${LIBTZ_SO} ${libtzsvc_LDFLAGS})
+TARGET_LINK_LIBRARIES(${LIBDEVICE_INFO_SO} ${libdevice_info_LDFLAGS} cryptsvc)
 
-#IF("${ARCH}" MATCHES "arm")
-#TARGET_LINK_LIBRARIES(${LIBTZ_SO})
-#ENDIF("${ARCH}" MATCHES "arm")
+IF("${ARCH}" MATCHES "arm")
+TARGET_LINK_LIBRARIES(${LIBDEVICE_INFO_SO})
+ENDIF("${ARCH}" MATCHES "arm")
 
 
-#SET_TARGET_PROPERTIES(
-#	${LIBTZ_SO}
-#	PROPERTIES
-#	VERSION ${FULLVER}
-#	SOVERSION ${MAJORVER}
-#)
+SET_TARGET_PROPERTIES(
+    ${LIBDEVICE_INFO_SO}
+    PROPERTIES
+    VERSION ${FULLVER}
+    SOVERSION ${MAJORVER}
+)
 ##################################################################################################################
 
 
@@ -115,7 +115,9 @@ CONFIGURE_FILE(${PROJECT_NAME}.pc.in ${PROJECT_NAME}.pc @ONLY)
 
 INSTALL(FILES ${PROJECT_NAME}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
 INSTALL(TARGETS ${PROJECT_NAME} DESTINATION ${LIB_INSTALL_DIR})
-INSTALL(TARGETS ${LIBTZ_SO} DESTINATION ${LIB_INSTALL_DIR})
+INSTALL(TARGETS ${LIBDEVICE_INFO_SO} DESTINATION ${LIB_INSTALL_DIR})
 INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION ${INCLUDEDIR})
 
 ADD_DEFINITIONS(-D_bool_cryptsvc)
+
+ADD_SUBDIRECTORY(gadget)
