@@ -9,6 +9,7 @@ Source1001: 	libcryptsvc.manifest
 BuildRequires: cmake
 BuildRequires: pkgconfig(dlog)
 BuildRequires: pkgconfig(openssl)
+BuildRequires: pkgconfig(capi-system-info)
 
 %description
 Crypto Service Library.
@@ -46,6 +47,7 @@ make %{?jobs:-j%jobs}
 %manifest %{name}.manifest
 %license  LICENSE.APLv2
 %{_libdir}/*.so*
+%attr(755,root,root) /opt/etc/duid-gadget
 
 %files devel
 %manifest %{name}.manifest
