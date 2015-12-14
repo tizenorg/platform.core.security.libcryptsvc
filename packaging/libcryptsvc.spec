@@ -5,13 +5,12 @@ Release:    6
 Group:      Security/Libraries
 License:    Apache-2.0
 Source0:    %{name}-%{version}.tar.gz
-Source1001: 	libcryptsvc.manifest
+Source1001: libcryptsvc.manifest
 BuildRequires: cmake
 BuildRequires: pkgconfig(dlog)
 BuildRequires: pkgconfig(openssl)
 BuildRequires: pkgconfig(capi-system-info)
 BuildRequires:  pkgconfig(libtzplatform-config)
-Requires: pkgconfig(libtzplatform-config)
 
 %description
 Crypto Service Library.
