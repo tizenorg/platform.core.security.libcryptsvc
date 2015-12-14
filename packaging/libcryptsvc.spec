@@ -11,7 +11,6 @@ BuildRequires: pkgconfig(dlog)
 BuildRequires: pkgconfig(openssl)
 BuildRequires: pkgconfig(capi-system-info)
 BuildRequires:  pkgconfig(libtzplatform-config)
-Requires: pkgconfig(libtzplatform-config)
 
 %description
 Crypto Service Library.
