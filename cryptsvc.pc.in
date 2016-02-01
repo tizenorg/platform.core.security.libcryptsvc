@@ -1,13 +1,13 @@
 # Package Information for pkg-config
 
-prefix=@PREFIX@
+prefix=@CMAKE_INSTALL_PREFIX@
 libdir=@LIB_INSTALL_DIR@
-includedir=@INCLUDE_INSTALL_DIR@
+includedir=${prefix}/include
 
-Name: @PC_NAME@
+Name: cryptsvc
 Description: @DESCRIPTION@
-Version: @FULLVER@
+Version: @VERSION@
 Requires: @PC_REQUIRED@
-Libs: -L${libdir} @PC_LDFLAGS@
+Libs: -L${libdir} -lcryptsvc
 Cflags: -I${includedir}
 

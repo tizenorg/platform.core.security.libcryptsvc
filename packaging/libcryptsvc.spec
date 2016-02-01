@@ -1,14 +1,14 @@
-Name:      libcryptsvc
+Name:       libcryptsvc
 Summary:    Crypto Service Library
 Version:    0.0.1
 Release:    6
 Group:      Security/Libraries
-License:    Apache-2.0
+License:    Apache-2.0 and BSL-1.0
 Source0:    %{name}-%{version}.tar.gz
 Source1001: libcryptsvc.manifest
 BuildRequires: cmake
 BuildRequires: pkgconfig(dlog)
-BuildRequires: pkgconfig(openssl)
+BuildRequires: pkgconfig(libcrypto)
 BuildRequires: pkgconfig(capi-system-info)
 BuildRequires:  pkgconfig(libtzplatform-config)
 
@@ -18,23 +18,50 @@ Crypto Service Library.
 %package devel
 Summary:    Crypto Service Library (Development)
 Group:      Security/Libraries
-Requires: %{name} = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 
 %description devel
 Crypto Service Library (Development).
+
+%package test
+Summary:    Testing for Crypto Service
+Group:      Security/Testing
+BuildRequires: boost-devel
+Requires:   boost-test
+Requires:   %{name} = %{version}-%{release}
+
+%description test
+Testing for Crypto Service.
 
 %prep
 %setup -q
 cp %{SOURCE1001} .
 
 %build
-MAJORVER=`echo %{version} | awk 'BEGIN {FS="."}{print $1}'`
-%ifarch %ix86 x86_64
-%cmake . -DARCH=x86 \
-%else
-%cmake . -DARCH=arm \
+export CFLAGS="$CFLAGS -DTIZEN_DEBUG_ENABLE"
+export CXXFLAGS="$CXXFLAGS -DTIZEN_DEBUG_ENABLE"
+export FFLAGS="$FFLAGS -DTIZEN_DEBUG_ENABLE"
+
+export CFLAGS="$CFLAGS -DTIZEN_ENGINEER_MODE"
+export CXXFLAGS="$CXXFLAGS -DTIZEN_ENGINEER_MODE"
+export FFLAGS="$FFLAGS -DTIZEN_ENGINEER_MODE"
+
+%ifarch %ix86
+export CFLAGS="$CFLAGS -DTIZEN_EMULATOR_MODE"
+export CXXFLAGS="$CXXFLAGS -DTIZEN_EMULATOR_MODE"
+export FFLAGS="$FFLAGS -DTIZEN_EMULATOR_MODE"
 %endif
-    -DFULLVER=%{version} -DMAJORVER=${MAJORVER} -DDESCRIPTION="%{summary}" \
+
+%{!?build_type:%define build_type "Release"}
+%cmake . \
+    -DCMAKE_BUILD_TYPE=%build_type \
+%ifarch %ix86 x86_64
+    -DARCH=x86 \
+%else
+    -DARCH=arm \
+%endif
+    -DVERSION=%version \
+    -DDESCRIPTION="%summary" \
     -DTZ_SYS_ETC=%TZ_SYS_ETC
 
 make %{?jobs:-j%jobs}
@@ -49,11 +76,17 @@ make %{?jobs:-j%jobs}
 
 %files
 %manifest %{name}.manifest
-%license  LICENSE.APLv2
-%{_libdir}/*.so*
-%attr(755,root,root) %{TZ_SYS_ETC}/duid-gadget
+%license LICENSE
+%license LICENSE.BSL-1.0
+%{_libdir}/libcryptsvc.so.*
+%{_libdir}/libdevice_info.so.*
+%{TZ_SYS_ETC}/duid-gadget
 
 %files devel
-%manifest %{name}.manifest
 %{_includedir}/*
+%{_libdir}/libcryptsvc.so
+%{_libdir}/libdevice_info.so
 %{_libdir}/pkgconfig/cryptsvc.pc
+
+%files test
+%{_bindir}/cryptsvc-test
