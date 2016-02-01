@@ -25,6 +25,8 @@ extern "C"
 {
 #endif
 
+#include <stdbool.h>
+
 //#ifdef OPENSSL_NO_ENGINE
 //#error Do not use define <OPENSSL_NO_ENGINE>
 //#else
@@ -56,10 +58,6 @@ typedef enum
 	SEC_CRYPTO_ERROR_7, //Internal error
 } SecError;
 */
-//#ifndef bool
-#ifdef _bool_cryptsvc
-typedef enum {false, true} bool;
-#endif
 
 #ifndef IN
 #define IN
