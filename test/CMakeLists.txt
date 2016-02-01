@@ -1,0 +1,32 @@
+SET(TARGET_CS_TEST cryptsvc-test)
+
+FIND_PACKAGE(Threads REQUIRED)
+ADD_DEFINITIONS("-DBOOST_TEST_DYN_LINK")
+
+PKG_CHECK_MODULES(CS_TEST_DEP REQUIRED ${CRYPTSVC_REQUIRES})
+
+INCLUDE_DIRECTORIES(
+    ${CS_TEST_DEP_INCLUDE_DIRS}
+    ${PROJECT_SOURCE_DIR}/include
+    .
+)
+
+SET(CS_TEST_SRCS
+    colour_log_formatter.cc
+    main.cc
+    cs_test.cc
+    device_info_test.cc
+    ${PROJECT_SOURCE_DIR}/srcs/SecCryptoSvc.c
+    ${PROJECT_SOURCE_DIR}/srcs/device_info.c
+)
+
+ADD_EXECUTABLE(${TARGET_CS_TEST} ${CS_TEST_SRCS})
+
+TARGET_LINK_LIBRARIES(${TARGET_CS_TEST}
+    ${CS_TEST_DEP_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT}
+    boost_unit_test_framework
+    -ldl
+)
+
+INSTALL(TARGETS ${TARGET_CS_TEST} DESTINATION bin)

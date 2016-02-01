@@ -1,123 +1,93 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-PROJECT(cryptsvc C)
-
-SET(PREFIX ${CMAKE_INSTALL_PREFIX})
-SET(EXEC_PREFIX "\${prefix}")
-SET(INCLUDEDIR "\${prefix}/include")
-
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include)
-
-SET(pc_requires " openssl dlog libcrypto capi-system-info")
+PROJECT(cryptsvc)
 
 INCLUDE(FindPkgConfig)
-pkg_check_modules(pkgs REQUIRED ${pc_requires})
 
-FOREACH(flag ${pkgs_CFLAGS})
-	SET(EXTRA_CFLAGS "${EXTRA_CFLAGS} ${flag}")
-ENDFOREACH(flag)
+STRING(REGEX MATCH "([^.]*)" SO_VERSION "${VERSION}")
 
-SET(source_dir "./srcs")
-SET(include_dir "./include")
-SET(test_dir "./test")
+SET(EXTRA_CXXFLAGS "${EXTRA_CXXFLAGS} -std=c++0x")
 
-SET(EXTRA_CFLAGS "${EXTRA_CFLAGS} -fvisibility=hidden")
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_CFLAGS}")
-SET(EXTRA_CXXFLAGS "${EXTRA_CXXFLAGS} ${EXTRA_CFLAGS}")
+SET(CMAKE_C_FLAGS_PROFILING   "-g -O0 -pg -Wp,-U_FORITY_SOURCE")
+SET(CMAKE_CXX_FLAGS_PROFILING "-g -O0 -pg -Wp,-U_FORITY_SOURCE ${EXTRA_CXXFLAGS}")
+SET(CMAKE_C_FLAGS_DEBUG       "-g -O0 -ggdb -Wp,-U_FORITY_SOURCE")
+SET(CMAKE_CXX_FLAGS_DEBUG     "-g -O0 -ggdb -Wp,-U_FORITY_SOURCE ${EXTRA_CXXFLAGS}")
+SET(CMAKE_C_FLAGS_RELEASE     "-g -O2")
+SET(CMAKE_CXX_FLAGS_RELEASE   "-g -O2 ${EXTRA_CXXFLAGS}")
 
-#ADD_DEFINITIONS("-DCTR_SUPPORT")	# for using CTR mode
-#ADD_DEFINITIONS("-DCRYPT_SVC_LOG")	# for debug
-#ADD_DEFINITIONS("-DCRYPTOSVC_TARGET")	# to get DUK from Target
+SET(TARGET_CRYPTSVC ${PROJECT_NAME})
+SET(TARGET_DEVICE_INFO "device_info")
+SET(TARGET_GADGET "duid-gadget")
 
-##################################################################################################################
+IF("${ARCH}" MATCHES "arm")
+    ADD_DEFINITIONS("-DCRYPTOSVC_TARGET")
+ENDIF("${ARCH}" MATCHES "arm")
+
+########################################################################################
 # for libcryptsvc.so
-SET(SRCS
-	${source_dir}/SecCryptoSvc.c
+SET(CRYPTSVC_REQUIRES "libcrypto dlog capi-system-info")
+PKG_CHECK_MODULES(CS_DEP REQUIRED ${CRYPTSVC_REQUIRES})
+
+SET(CS_SRCS srcs/SecCryptoSvc.c)
+
+INCLUDE_DIRECTORIES(
+    ${CS_DEP_INCLUDE_DIRS}
+    ${PROJECT_SOURCE_DIR}/include
 )
 
-SET(libcryptsvc_LDFLAGS "${pkgs_LDFLAGS}")
-SET(libcryptsvc_CFLAGS " ${CFLAGS} -fvisibility=hidden -g -fPIC -I${CMAKE_CURRENT_SOURCE_DIR}/include ")
-SET(libcryptsvc_CPPFLAGS " -DPIC ")
-
-ADD_LIBRARY(${PROJECT_NAME} SHARED ${SRCS})
-
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${libcryptsvc_LDFLAGS})
-
-IF("${ARCH}" MATCHES "arm")
-TARGET_LINK_LIBRARIES(${PROJECT_NAME})
-ENDIF("${ARCH}" MATCHES "arm")
+ADD_LIBRARY(${TARGET_CRYPTSVC} SHARED ${CS_SRCS})
 
 SET_TARGET_PROPERTIES(
-	${PROJECT_NAME}
-	PROPERTIES
-	VERSION ${FULLVER}
-	SOVERSION ${MAJORVER}
-)
-##################################################################################################################
-
-##################################################################################################################
-# for libdevice_info.so
-SET(SRCS_DEVICE_INFO
-    ${source_dir}/device_info.c
-)
-
-SET(libdevice_info_LDFLAGS "${pkgs_LDFLAGS}")
-SET(libdevice_info_CFLAGS " ${CFLAGS} ${CMAKE_C_FLAGS} -fvisibility=hidden -g -fPIC -I${CMAKE_CURRENT_SOURCE_DIR}/include ")
-SET(libdevice_info_CPPFLAGS " -DPIC ")
-
-SET(LIBDEVICE_INFO_SO "device_info")
-ADD_LIBRARY(${LIBDEVICE_INFO_SO} SHARED ${SRCS_DEVICE_INFO})
-
-TARGET_LINK_LIBRARIES(${LIBDEVICE_INFO_SO} ${libdevice_info_LDFLAGS} cryptsvc)
-
-IF("${ARCH}" MATCHES "arm")
-TARGET_LINK_LIBRARIES(${LIBDEVICE_INFO_SO})
-ENDIF("${ARCH}" MATCHES "arm")
-
-
-SET_TARGET_PROPERTIES(
-    ${LIBDEVICE_INFO_SO}
+    ${TARGET_CRYPTSVC}
     PROPERTIES
-    VERSION ${FULLVER}
-    SOVERSION ${MAJORVER}
+        COMPILE_FLAGS "-fPIC -fvisibility=hidden"
+        SOVERSION ${SO_VERSION}
+        VERSION ${VERSION}
 )
-##################################################################################################################
 
+TARGET_LINK_LIBRARIES(${TARGET_CRYPTSVC} ${CS_DEP_LIBRARIES})
 
-##################################################################################################################
-# for module_test
-#SET(module_test_SOURCES
-	#${test_dir}/module_test.c
-	#${source_dir}/CryptoSvc-debug.c
-#)
+INSTALL(TARGETS ${TARGET_CRYPTSVC} DESTINATION ${LIB_INSTALL_DIR})
 
-#SET(module_test_CFLAGS " -fvisibility=hidden -I. -I${CMAKE_CURRENT_SOURCE_DIR}/include ")
-#SET(module_test_LDFALGS " -module -avoid-version ${pkgs_LDFLAGS} ")
+#########################################################################################
+# for libdevice_info.so
+PKG_CHECK_MODULES(DEVICE_INFO_DEP
+    REQUIRED
+    dlog
+    capi-system-info
+)
 
-#ADD_EXECUTABLE(${test_dir}/module_test ${module_test_SOURCES})
-#TARGET_LINK_LIBRARIES(${test_dir}/module_test ${pkgs_LDFLAGS} cryptsvc)
-#SET_TARGET_PROPERTIES(${test_dir}/module_test PROPERTIES COMPILE_FLAGS "${module_test_CFLAGS} ")
-##################################################################################################################
+SET(DEVICE_INFO_SRCS srcs/device_info.c)
 
-#FIND_PROGRAM(UNAME NAMES uname)
-#EXEC_PROGRAM("${UNAME}" ARGS "-m" OUTPUT_VARIABLE "ARCH")
-IF("${ARCH}" MATCHES "arm")
-	#ADD_DEFINITIONS("-DTARGET")
-	ADD_DEFINITIONS("-DCRYPTOSVC_TARGET")
-	ADD_DEFINITIONS("-DCRYPTOSVC_TZ")
-	#MESSAGE("add -DTARGET")
-ENDIF("${ARCH}" MATCHES "arm")
+INCLUDE_DIRECTORIES(
+    ${DEVICE_INFO_DEP_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 
-SET(PC_NAME ${PROJECT_NAME})
-SET(PC_DESCRIPTION ${DESCRIPTION})
-SET(PC_LDFLAGS " -l${PROJECT_NAME} ")
-SET(PC_REQUIRED ${pc_requires})
-CONFIGURE_FILE(${PROJECT_NAME}.pc.in ${PROJECT_NAME}.pc @ONLY)
+ADD_LIBRARY(${TARGET_DEVICE_INFO} SHARED ${DEVICE_INFO_SRCS})
 
-INSTALL(FILES ${PROJECT_NAME}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
-INSTALL(TARGETS ${PROJECT_NAME} DESTINATION ${LIB_INSTALL_DIR})
-INSTALL(TARGETS ${LIBDEVICE_INFO_SO} DESTINATION ${LIB_INSTALL_DIR})
-INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION ${INCLUDEDIR})
+SET_TARGET_PROPERTIES(
+    ${TARGET_DEVICE_INFO}
+    PROPERTIES
+        COMPILE_FLAGS "-fPIC -fvisibility=hidden"
+        SOVERSION ${SO_VERSION}
+        VERSION ${VERSION}
+)
 
-ADD_DEFINITIONS(-D_bool_cryptsvc)
+TARGET_LINK_LIBRARIES(${TARGET_DEVICE_INFO}
+    ${TARGET_CRYPTSVC}
+    ${DEVICE_INFO_DEP_LIBRARIES}
+    -lpthread
+)
+
+INSTALL(TARGETS ${TARGET_DEVICE_INFO} DESTINATION ${LIB_INSTALL_DIR})
+
+#########################################################################################
+
+SET(PC_REQUIRED ${CRYPTSVC_REQUIRES})
+CONFIGURE_FILE(${TARGET_CRYPTSVC}.pc.in ${TARGET_CRYPTSVC}.pc @ONLY)
+
+INSTALL(FILES ${TARGET_CRYPTSVC}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
+INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION ${INCLUDE_INSTALL_DIR})
 
 ADD_SUBDIRECTORY(gadget)
+ADD_SUBDIRECTORY(test)
