@@ -269,3 +269,50 @@ exit:
 	return pKeyVersion;
 }
 
+CS_API
+int cs_derive_key_with_pass(const char *pass, int passlen, int keylen, unsigned char **key)
+{
+	const int PBKDF_ITERATE_NUM = 1;
+	unsigned char *platform_key = NULL;
+	unsigned char *derived_key = NULL;
+	int retval = CS_ERROR_NONE;
+
+	if (pass == NULL || key == NULL || keylen <= 0)
+		return CS_ERROR_INVALID_PARAM;
+
+	platform_key = (unsigned char *)malloc(sizeof(unsigned char) * keylen);
+	if (platform_key == NULL)
+		return CS_ERROR_BAD_ALLOC;
+
+	if (!SecFrameGeneratePlatformUniqueKey(keylen, platform_key)) {
+		retval = CS_ERROR_INTERNAL;
+		goto exit;
+	}
+
+	derived_key = (unsigned char *)malloc(sizeof(unsigned char) * keylen);
+	if (derived_key == NULL) {
+		retval = CS_ERROR_BAD_ALLOC;
+		goto exit;
+	}
+
+	retval = PKCS5_PBKDF2_HMAC(pass, passlen,
+			platform_key, keylen,
+			PBKDF_ITERATE_NUM, EVP_sha1(),
+			keylen, derived_key);
+	if (retval != 1) {
+		retval = CS_ERROR_INTERNAL;
+		goto exit;
+	}
+
+	free(platform_key);
+
+	*key = derived_key;
+
+	return CS_ERROR_NONE;
+
+exit:
+	free(platform_key);
+	free(derived_key);
+
+	return retval;
+}
