@@ -113,13 +113,10 @@ static const char Base64EncodingTable[] = {
 	* @param[in]		uLen	Length of Device UniqueKey
 	* @param[in,out]	pCek	Device UniqueKey(Hashed)
 */
-__attribute__((visibility("default")))
-bool SecFrameGeneratePlatformUniqueKey(IN UINT32  uLen,IN OUT UINT8  *pCek);
+bool SecFrameGeneratePlatformUniqueKey(IN UINT32 uLen, IN OUT UINT8 *pCek);
 
-__attribute__((visibility("default")))
-char* Base64Encoding(char* pData, int size);
+char* Base64Encoding(const char *data, int size);
 
-__attribute__((visibility("default")))
 char* GetDuid(int size);
 
 #ifdef __cplusplus
