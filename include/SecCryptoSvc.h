@@ -1,7 +1,5 @@
 /*
- * libcryptsvc - device unique key
- *
- * Copyright (c) 2000 - 2013 Samsung Electronics Co., Ltd All Rights Reserved
+ * Copyright (c) 2000 - 2016 Samsung Electronics Co., Ltd All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,6 +93,11 @@ typedef enum
 #define HASH_LEN			20
 //#define SEC_KEYMGR_FEK_SIZE		16
 
+#define CS_ERROR_NONE           0
+#define CS_ERROR_BAD_ALLOC     -1
+#define CS_ERROR_INTERNAL      -2
+#define CS_ERROR_INVALID_PARAM -3
+
 /*------ Base64 Encoding Table ------*/
 static const char Base64EncodingTable[] = {
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
@@ -118,6 +121,26 @@ bool SecFrameGeneratePlatformUniqueKey(IN UINT32 uLen, IN OUT UINT8 *pCek);
 char* Base64Encoding(const char *data, int size);
 
 char* GetDuid(int size);
+
+/*
+ *  Password based derivation routines with platform key
+ *
+ *  @remarks Returned @a key should be freed by caller after use.
+ *
+ *  @param[in]  pass     password used in the key derivation. Shouldn't be NULL
+ *  @param[in]  passlen  length of @a password to use
+ *  @param[in]  keylen   length of key to make which should be bigger than 0
+ *  @param[out] key      derived key with @a pass and platform key. Shouldn't be NULL
+ *
+ *  @return CS_ERROR_NONE on success, otherwise negative error codes
+ *  #retval CS_ERROR_NONE           Success
+ *  #retval CS_ERROR_BAD_ALLOC      Memory allocation failed to new key
+ *  #retval CS_ERROR_INTERNAL       Internal error which should not be happened
+ *  #retval CS_ERROR_INVALID_PARAM  Invalid parameter. @a pass and @a key shouldn't be NULL
+ *                                  and keylen should be bigger than 0
+ */
+int cs_derive_key_with_pass(const char *pass, int passlen, int keylen,
+                            unsigned char **key);
 
 #ifdef __cplusplus
 }

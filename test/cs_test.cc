@@ -20,6 +20,8 @@
  * @version
  * @brief
  */
+
+#include <stdlib.h>
 #include <iostream>
 
 #include <boost/test/unit_test.hpp>
@@ -44,6 +46,8 @@ BOOST_AUTO_TEST_CASE(PLATFORM_UNIQUE_KEY)
 
     std::cout << "base64 encoded platform unique key(with len 16): "
         << encoded_cek << std::endl;
+
+    free(encoded_cek);
 }
 
 BOOST_AUTO_TEST_CASE(GETDUID_16)
@@ -51,6 +55,8 @@ BOOST_AUTO_TEST_CASE(GETDUID_16)
     char *duid = GetDuid(16);
     BOOST_REQUIRE_MESSAGE(duid != nullptr, "returned duid shouldn't be null");
     std::cout << "duid: " << duid << std::endl;
+
+    free(duid);
 }
 
 BOOST_AUTO_TEST_CASE(GETDUID_20)
@@ -58,7 +64,40 @@ BOOST_AUTO_TEST_CASE(GETDUID_20)
     char *duid = GetDuid(20);
     BOOST_REQUIRE_MESSAGE(duid != nullptr, "returned duid shouldn't be null");
     std::cout << "duid: " << duid << std::endl;
+
+    free(duid);
 }
 
+static void derive_key_with_pass(const char *pass, int passlen)
+{
+    int retval = CS_ERROR_NONE;
+    constexpr unsigned int KeyLen = 20;
+    unsigned char *key = nullptr;
+
+    BOOST_REQUIRE_MESSAGE(
+        (retval = cs_derive_key_with_pass(pass, passlen, KeyLen, &key)) == CS_ERROR_NONE,
+        "Failed to cs_derive_key_with_pass with retval: " << retval);
+
+    char *encoded_key = Base64Encoding(
+            reinterpret_cast<char *>(key),
+            static_cast<int>(KeyLen));
+    BOOST_REQUIRE_MESSAGE(encoded_key != nullptr, "Failed to base64 encoding.");
+
+    std::cout << "base64 encoded key derived from pass(len " << KeyLen
+        << "): " << encoded_key << std::endl;
+
+    free(encoded_key);
+}
+
+BOOST_AUTO_TEST_CASE(DERIVE_KEY_WITH_PASS)
+{
+    const char *test_pass = "test-password";
+    derive_key_with_pass(test_pass, 5);
+    derive_key_with_pass(test_pass, 10);
+    derive_key_with_pass(test_pass, strlen(test_pass));
+
+    const char empty_pass[30] = {0, };
+    derive_key_with_pass(empty_pass, strlen(empty_pass));
+}
 
 BOOST_AUTO_TEST_SUITE_END()
