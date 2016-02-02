@@ -30,6 +30,8 @@
 
 #include "SecCryptoSvc.h"
 
+#define CS_API __attribute__((visibility("default")))
+
 #define SYS_SECBOOT_DEV_ID_LEN	16
 #define NAND_CID_NAME	"/sys/block/mmcblk0/device/cid"
 #define NAND_CID_SIZE	32
@@ -59,7 +61,7 @@ static int __AsciiToHex(const char AsciiHexUpper,const char AsciiHexLower)
 	return hexReturn;
 }
 
-bool OemNandInfoUID(unsigned char *pUID, int nBufferSize)
+static bool OemNandInfoUID(unsigned char *pUID, int nBufferSize)
 {
 	int fd = 0;
 	char szCID[NAND_CID_SIZE + 1] = {0,};
@@ -79,29 +81,29 @@ bool OemNandInfoUID(unsigned char *pUID, int nBufferSize)
 	}
 
 	//manufacturer_id
-	pUID[0] =  __AsciiToHex((const char)szCID[0], (const char)szCID[1]);
+	pUID[0] =  __AsciiToHex(szCID[0], szCID[1]);
 	//oem_id
-	pUID[4] =  __AsciiToHex((const char)szCID[4], (const char)szCID[5]);
+	pUID[4] =  __AsciiToHex(szCID[4], szCID[5]);
 	//prod_rev
-	pUID[8] =  __AsciiToHex((const char)szCID[18], (const char)szCID[19]);
+	pUID[8] =  __AsciiToHex(szCID[18], szCID[19]);
 	//serial
-	pUID[15] = __AsciiToHex((const char)szCID[20], (const char)szCID[21]);
-	pUID[14] =  __AsciiToHex((const char)szCID[22], (const char)szCID[23]);
-	pUID[13] = __AsciiToHex((const char)szCID[24], (const char)szCID[25]);
-	pUID[12] =  __AsciiToHex((const char)szCID[26], (const char)szCID[27]);
+	pUID[15] = __AsciiToHex(szCID[20], szCID[21]);
+	pUID[14] =  __AsciiToHex(szCID[22], szCID[23]);
+	pUID[13] = __AsciiToHex(szCID[24], szCID[25]);
+	pUID[12] =  __AsciiToHex(szCID[26], szCID[27]);
 
 	// random permutation
-	pUID[1] = __AsciiToHex((const char)szCID[2], (const char)szCID[3]);
-	pUID[2] = __AsciiToHex((const char)szCID[6], (const char)szCID[7]);
-	pUID[3] = __AsciiToHex((const char)szCID[8], (const char)szCID[9]);
+	pUID[1] = __AsciiToHex(szCID[2], szCID[3]);
+	pUID[2] = __AsciiToHex(szCID[6], szCID[7]);
+	pUID[3] = __AsciiToHex(szCID[8], szCID[9]);
 
-	pUID[5] = __AsciiToHex((const char)szCID[10], (const char)szCID[11]);
-	pUID[6] = __AsciiToHex((const char)szCID[12], (const char)szCID[13]);
-	pUID[7] = __AsciiToHex((const char)szCID[14], (const char)szCID[15]);
+	pUID[5] = __AsciiToHex(szCID[10], szCID[11]);
+	pUID[6] = __AsciiToHex(szCID[12], szCID[13]);
+	pUID[7] = __AsciiToHex(szCID[14], szCID[15]);
 
-	pUID[9] = __AsciiToHex((const char)szCID[16], (const char)szCID[17]);
-	pUID[10] = __AsciiToHex((const char)szCID[28], (const char)szCID[29]);
-	pUID[11] = __AsciiToHex((const char)szCID[30], (const char)szCID[31]);
+	pUID[9] = __AsciiToHex(szCID[16], szCID[17]);
+	pUID[10] = __AsciiToHex(szCID[28], szCID[29]);
+	pUID[11] = __AsciiToHex(szCID[30], szCID[31]);
 
 	SLOGD(" UID : %8X %8X %8X %8X",
 		*(int *)pUID,
@@ -113,7 +115,7 @@ bool OemNandInfoUID(unsigned char *pUID, int nBufferSize)
 	return true;
 }
 
-void SysSecBootGetDeviceUniqueKey(unsigned char *pUniquekey)
+static void SysSecBootGetDeviceUniqueKey(unsigned char *pUniquekey)
 {
 	if (!OemNandInfoUID(pUniquekey, SYS_SECBOOT_DEV_ID_LEN))
 		memset(pUniquekey, 0x00, SYS_SECBOOT_DEV_ID_LEN);
@@ -121,6 +123,7 @@ void SysSecBootGetDeviceUniqueKey(unsigned char *pUniquekey)
 #endif
 
 
+CS_API
 bool SecFrameGeneratePlatformUniqueKey(unsigned int uLen, unsigned char *pCek)
 {
 	bool bResult = true;
@@ -171,11 +174,12 @@ ERR:
 	return bResult;
 }
 
-char *Base64Encoding(char *pData, int size)
+CS_API
+char *Base64Encoding(const char *pData, int size)
 {
 	char *pEncodedBuf = NULL;
-	char *pPointer = NULL;
-	char *pLength = pData + size - 1;
+	const char *pPointer = NULL;
+	const char *pLength = pData + size - 1;
 	unsigned char pInput[3] = {0,0,0};
 	unsigned char poutput[4] = {0,0,0,0};
 	int index = 0;
@@ -212,6 +216,7 @@ char *Base64Encoding(char *pData, int size)
 	return pEncodedBuf;
 }
 
+CS_API
 char *GetDuid(int idSize)
 {
 	const char *version = "1.0#";
