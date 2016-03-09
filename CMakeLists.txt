@@ -14,6 +14,11 @@ SET(CMAKE_CXX_FLAGS_DEBUG     "-g -O0 -ggdb -Wp,-U_FORITY_SOURCE ${EXTRA_CXXFLAG
 SET(CMAKE_C_FLAGS_RELEASE     "-g -O2")
 SET(CMAKE_CXX_FLAGS_RELEASE   "-g -O2 ${EXTRA_CXXFLAGS}")
 
+# Set compiler warning flags
+ADD_DEFINITIONS("-Werror")                      # Make all warnings into errors.
+ADD_DEFINITIONS("-Wall")                        # Generate all warnings
+ADD_DEFINITIONS("-Wextra")                      # Generate even more extra warnings
+
 SET(TARGET_CRYPTSVC ${PROJECT_NAME})
 SET(TARGET_DEVICE_INFO "device_info")
 SET(TARGET_GADGET "duid-gadget")

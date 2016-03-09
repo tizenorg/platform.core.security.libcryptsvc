@@ -29,24 +29,10 @@ namespace cryptsvc {
 
 namespace {
 
-const char* BOLD_GREEN_BEGIN = "\033[1;32m";
-const char* BOLD_GREEN_END = "\033[m";
-const char* RED_BEGIN = "\033[0;31m";
-const char* RED_END = "\033[m";
-const char* PURPLE_BEGIN = "\033[0;35m";
-const char* PURPLE_END = "\033[m";
-const char* GREEN_BEGIN = "\033[0;32m";
-const char* GREEN_END = "\033[m";
-const char* CYAN_BEGIN = "\033[0;36m";
-const char* CYAN_END = "\033[m";
-const char* BOLD_RED_BEGIN = "\033[1;31m";
-const char* BOLD_RED_END = "\033[m";
-const char* BOLD_YELLOW_BEGIN = "\033[1;33m";
-const char* BOLD_YELLOW_END = "\033[m";
-const char* BOLD_GOLD_BEGIN = "\033[0;33m";
-const char* BOLD_GOLD_END = "\033[m";
-const char* BOLD_WHITE_BEGIN = "\033[1;37m";
-const char* BOLD_WHITE_END = "\033[m";
+const char* COLOR_RED = "\033[0;31m";
+const char* COLOR_GREEN = "\033[0;32m";
+const char* COLOR_CYAN = "\033[0;36m";
+const char* COLOR_BOLD_YELLOW = "\033[1;33m";
 const char* COLOR_END = "\033[m";
 
 const_string
@@ -128,16 +114,16 @@ colour_log_formatter::test_unit_finish(
         output << "Finished test " << tu.p_type_name << " \"" << tu.p_name << "\""<< std::endl;
         return;
     }
-    std::string color = GREEN_BEGIN;
+    std::string color = COLOR_GREEN;
     std::string status = "OK";
     if (m_isTestCaseFailed) {
-        color = RED_BEGIN;
+        color = COLOR_RED;
         status = "FAIL";
     }
     output << "\t" << "[   " << color << status << COLOR_END << "   ]";
 
 
-    output << ", " << CYAN_BEGIN << "time: ";
+    output << ", " << COLOR_CYAN << "time: ";
     if( elapsed > 0 ) {
         if( elapsed % 1000 == 0 )
             output << elapsed/1000 << "ms";
@@ -170,7 +156,7 @@ colour_log_formatter::log_exception(
         boost::execution_exception const& ex )
 {
     boost::execution_exception::location const& loc = ex.where();
-    output << '\t' << BOLD_YELLOW_BEGIN << get_basename(loc.m_file_name)
+    output << '\t' << COLOR_BOLD_YELLOW << get_basename(loc.m_file_name)
             << '(' << loc.m_line_num << "), ";
 
     output << "fatal error in \""
@@ -210,13 +196,13 @@ colour_log_formatter::log_entry_start(
             output << "warning in \"" << test_phase_identifier() << "\": ";
             break;
         case BOOST_UTL_ET_ERROR:
-            output << '\t' << BOLD_YELLOW_BEGIN <<  get_basename(entry_data.m_file_name)
+            output << '\t' << COLOR_BOLD_YELLOW <<  get_basename(entry_data.m_file_name)
                 << '(' << entry_data.m_line_num << "), ";
             output << "error in \"" << test_phase_identifier() << "\": ";
             m_isTestCaseFailed = true;
             break;
         case BOOST_UTL_ET_FATAL_ERROR:
-            output << '\t' << BOLD_YELLOW_BEGIN <<  get_basename(entry_data.m_file_name)
+            output << '\t' << COLOR_BOLD_YELLOW <<  get_basename(entry_data.m_file_name)
                 << '(' << entry_data.m_line_num << "),  ";
             output <<  " fatal error in \"" << test_phase_identifier() << "\": ";
             m_isTestCaseFailed = true;
